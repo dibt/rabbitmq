@@ -1,6 +1,7 @@
 package com.povosdi.rabbitmq.consumer;
 
-import com.povosdi.rabbitmq.configuration.DirectMqConfig;
+import static com.povosdi.rabbitmq.configuration.DirectMqConfig.DIRECT_QUEUE;
+
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class DirectConsumer {
     
-    @RabbitListener(queues = DirectMqConfig.DIRECT_QUEUE)
+    @RabbitListener(queues = DIRECT_QUEUE)
     public void receiverDirectMessage(Message message){
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-        log.info("模拟接收{}类型的消息:{}", DirectMqConfig.DIRECT_QUEUE,msg);
+        log.info("模拟接收{}类型的消息:{}", DIRECT_QUEUE,msg);
     }
     
 }

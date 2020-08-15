@@ -74,6 +74,7 @@ public class DirectMqController {
         directProducer.sendNoExchangeErrorDirectMessage(message);
         return request.getRequestURL().toString()+" success";
     }
+    
    
     
 }

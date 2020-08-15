@@ -1,6 +1,10 @@
 package com.povosdi.rabbitmq.producter;
 
-import com.povosdi.rabbitmq.configuration.DirectMqConfig;
+import static com.povosdi.rabbitmq.configuration.DirectMqConfig.DIRECT_EXCHANGE;
+import static com.povosdi.rabbitmq.configuration.DirectMqConfig.DIRECT_EXCHANGE_NO_QUEUE;
+import static com.povosdi.rabbitmq.configuration.DirectMqConfig.DIRECT_NO_EXCHANGE;
+import static org.springframework.amqp.core.ExchangeTypes.DIRECT;
+
 import com.povosdi.rabbitmq.utils.JackJsonUtils;
 import com.povosdi.rabbitmq.utils.UUIDUtils;
 import java.util.Objects;
@@ -33,22 +37,22 @@ public class DirectProducer implements RabbitTemplate.ConfirmCallback,RabbitTemp
     public void sendDirectMessage(Object message){
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(UUIDUtils.getUuid());
-        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
-        rabbitTemplate.convertAndSend(DirectMqConfig.DIRECT_EXCHANGE, DirectMqConfig.DIRECT, message,correlationData);
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(DIRECT_EXCHANGE, DIRECT, message,correlationData);
     }
 
     public void sendNoQueueErrorDirectMessage(Object message){
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(UUID.randomUUID().toString());
-        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
-        rabbitTemplate.convertAndSend(DirectMqConfig.DIRECT_EXCHANGE_NO_QUEUE, DirectMqConfig.DIRECT, message,correlationData);
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(DIRECT_EXCHANGE_NO_QUEUE, DIRECT, message,correlationData);
     }
     
     public void sendNoExchangeErrorDirectMessage(Object message){
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(UUID.randomUUID().toString());
-        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
-        rabbitTemplate.convertAndSend(DirectMqConfig.DIRECT_NO_EXCHANGE, DirectMqConfig.DIRECT, message,correlationData);
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(DIRECT_NO_EXCHANGE, DIRECT, message,correlationData);
     }
     
     
@@ -57,17 +61,17 @@ public class DirectProducer implements RabbitTemplate.ConfirmCallback,RabbitTemp
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
         if(ack){
             if(Objects.isNull(correlationData.getReturnedMessage())){
-                log.info("{}类型消息唯一标识id:{} 成功发送到队列",DirectMqConfig.DIRECT,correlationData.getId());
-                log.info("模拟{}类型消息成功发送到队列的操作",DirectMqConfig.DIRECT);
+                log.info("{}类型消息唯一标识id:{} 成功发送到队列",DIRECT,correlationData.getId());
+                log.info("模拟{}类型消息成功发送到队列的操作",DIRECT);
                 return;
             }
-            log.error("{}类型消息唯一标识id:{} 成功发送到交换机:{}，但是没有找到对应队列",DirectMqConfig.DIRECT,correlationData.getId(),
+            log.error("{}类型消息唯一标识id:{} 成功发送到交换机:{}，但是没有找到对应队列",DIRECT,correlationData.getId(),
                 correlationData.getReturnedMessage().getMessageProperties().getReceivedExchange());
-            log.error("模拟{}类型消息成功发送到交换机但是没有发送到队列的操作,但是 ack 为true",DirectMqConfig.DIRECT);
+            log.error("模拟{}类型消息成功发送到交换机但是没有发送到队列的操作,但是 ack 为true",DIRECT);
             return;
         }
-        log.error("{}类型消息唯一标识id:{},失败原因,cause:{}",DirectMqConfig.DIRECT,correlationData.getId(),cause);
-        log.error("{}类型模拟消息没有发送到交换机的操作",DirectMqConfig.DIRECT);
+        log.error("{}类型消息唯一标识id:{},失败原因,cause:{}",DIRECT,correlationData.getId(),cause);
+        log.error("{}类型模拟消息没有发送到交换机的操作",DIRECT);
     }
     
     @Override

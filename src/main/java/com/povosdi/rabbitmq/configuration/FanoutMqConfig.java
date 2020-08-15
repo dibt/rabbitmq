@@ -19,8 +19,8 @@ public class FanoutMqConfig {
     public final static String FANOUT_QUEUE_ONE = "fanout_queue_one";
     public final static String FANOUT_QUEUE_TWO = "fanout_queue_two";
     public final static String FANOUT_QUEUE_THREE = "fanout_queue_three";
+    
     public final static String FANOUT_EXCHANGE = "fanout_exchange";
-    public final static String FANOUT = "fanout";
 
     /**
      * fanout 广播者模式队列
@@ -60,6 +60,5 @@ public class FanoutMqConfig {
     public Binding fanoutExchangeBingingThree() {
         return BindingBuilder.bind(fanoutQueueThree()).to(fanoutExchange());
     }
-    
 
 }

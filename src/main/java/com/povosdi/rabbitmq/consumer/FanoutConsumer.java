@@ -5,7 +5,6 @@ import static com.povosdi.rabbitmq.configuration.FanoutMqConfig.FANOUT_QUEUE_THR
 import static com.povosdi.rabbitmq.configuration.FanoutMqConfig.FANOUT_QUEUE_TWO;
 import static org.springframework.amqp.core.ExchangeTypes.FANOUT;
 
-import com.povosdi.rabbitmq.exception.BusinessException;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -36,7 +35,6 @@ public class FanoutConsumer {
     public void receiverDirectMessageError(Message message){
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         log.info("模拟接收 {} 类型 {} 队列的消息:{}", FANOUT,FANOUT_QUEUE_THREE,msg);
-        throw new BusinessException("异常");
     }
     
 }

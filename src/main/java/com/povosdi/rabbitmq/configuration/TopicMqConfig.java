@@ -1,7 +1,7 @@
 package com.povosdi.rabbitmq.configuration;
 
 import static com.povosdi.rabbitmq.configuration.DlqConfiguration.DEAD_LETTER_EXCHANGE;
-import static com.povosdi.rabbitmq.configuration.DlqConfiguration.DEAD_LETTER_QUEUE_ROUTING_KEY;
+import static com.povosdi.rabbitmq.configuration.DlqConfiguration.DEAD_LETTER_QUEUE_ROUTING_KEY_RETRY;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class TopicMqConfig {
     public final static String TOPIC_QUEUE_RIGHT = "topic_queue_right";
     public final static String TOPIC_QUEUE_COMMON = "topic_queue_common";
     public final static String TOPIC_QUEUE_ERROR = "topic_queue_error";
-    public final static String TOPIC_QUEUE_ERROR_FORWARD = "topic_queue_error_forward";
+
     
     public final static String TOPIC_EXCHANGE = "topic_exchange";
     
@@ -45,15 +45,12 @@ public class TopicMqConfig {
     }
     @Bean
     public Queue topicQueueError() {
-        return QueueBuilder.durable(TOPIC_QUEUE_ERROR).build();
-    }
-    @Bean
-    public Queue topicQueueErrorForward() {
         Map<String,Object> map = new HashMap<>(2);
         map.put("x-dead-letter-exchange",DEAD_LETTER_EXCHANGE);
-        map.put("x-dead-letter-routing-key",DEAD_LETTER_QUEUE_ROUTING_KEY);
+        map.put("x-dead-letter-routing-key",DEAD_LETTER_QUEUE_ROUTING_KEY_RETRY);
         return QueueBuilder.durable(TOPIC_QUEUE_ERROR).withArguments(map).build();
     }
+  
     
     /**
      * topic 交换器
@@ -79,8 +76,5 @@ public class TopicMqConfig {
     public Binding topicExchangeBingingError() {
         return BindingBuilder.bind(topicQueueError()).to(topicExchange()).with(TOPIC_ROUTING_KEY_ERROR);
     }
-    @Bean
-    public Binding topicExchangeBingingErrorForward() {
-        return BindingBuilder.bind(topicQueueErrorForward()).to(topicExchange()).with(TOPIC_ROUTING_KEY_ERROR);
-    }
+
 }

@@ -30,16 +30,10 @@ public class DirectMqController {
      */
     @GetMapping("direct")
     public String directTest(HttpServletRequest request,HttpServletResponse response){
-        MessageBody messageBody = new MessageBody(1000,"direct类型messageBody,当前时间："+ DateUtils.currentDateToyMdHmS());
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setContentType(CONTENT_TYPE_JSON);
-        messageProperties.setPublishSequenceNumber(1L);
-        messageProperties.setHeader("exchangeType","direct");
-        messageProperties.setContentEncoding("UTF-8");
-        Message message = new Message(JackJsonUtils.toJsonString(messageBody).getBytes(),messageProperties);
-        directProducer.sendDirectMessage(message);
+        directProducer.sendDirectMessage(getDirectMessage());
         return request.getRequestURL().toString()+" success";
     }
+    
     /**
      * 先从总体的情况分析，推送消息存在四种情况：
      *
@@ -51,15 +45,7 @@ public class DirectMqController {
      */
     @GetMapping("direct/no-queue-error")
     public String directNoQueueErrorTest(HttpServletRequest request,HttpServletResponse response) {
-        MessageBody messageBody = new MessageBody(1000,"direct类型messageBody,当前时间："+ DateUtils.currentDateToyMdHmS());
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setContentType(CONTENT_TYPE_JSON);
-        messageProperties.setPublishSequenceNumber(1L);
-        // 自定义参数
-        messageProperties.setHeader("exchangeType","direct");
-        messageProperties.setContentEncoding("UTF-8");
-        Message message = new Message(JackJsonUtils.toJsonString(messageBody).getBytes(),messageProperties);
-        directProducer.sendNoQueueErrorDirectMessage(message);
+        directProducer.sendNoQueueErrorDirectMessage(getDirectMessage());
         return request.getRequestURL().toString()+" success";
     }
     
@@ -68,11 +54,19 @@ public class DirectMqController {
      */
     @GetMapping("direct/no-exchange-error")
     public String directNoExchangeErrorTest(HttpServletRequest request,HttpServletResponse response) {
+        directProducer.sendNoExchangeErrorDirectMessage(getDirectMessage());
+        return request.getRequestURL().toString()+" success";
+    }
+    
+    
+    private Message getDirectMessage() {
         MessageBody messageBody = new MessageBody(1000,"direct类型messageBody,当前时间："+ DateUtils.currentDateToyMdHmS());
         MessageProperties messageProperties = new MessageProperties();
-        Message message = new Message(JackJsonUtils.toJsonString(messageBody).getBytes(),messageProperties);
-        directProducer.sendNoExchangeErrorDirectMessage(message);
-        return request.getRequestURL().toString()+" success";
+        messageProperties.setContentType(CONTENT_TYPE_JSON);
+        messageProperties.setPublishSequenceNumber(1L);
+        messageProperties.setHeader("exchangeType","direct");
+        messageProperties.setContentEncoding("UTF-8");
+        return new Message(JackJsonUtils.toJsonString(messageBody).getBytes(),messageProperties);
     }
     
    

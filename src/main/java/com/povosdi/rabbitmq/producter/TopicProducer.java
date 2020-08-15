@@ -1,5 +1,13 @@
 package com.povosdi.rabbitmq.producter;
 
+import static com.povosdi.rabbitmq.configuration.TopicMqConfig.TOPIC_EXCHANGE;
+import static com.povosdi.rabbitmq.configuration.TopicMqConfig.TOPIC_ROUTING_KEY_COMMON;
+import static com.povosdi.rabbitmq.configuration.TopicMqConfig.TOPIC_ROUTING_KEY_ERROR;
+import static com.povosdi.rabbitmq.configuration.TopicMqConfig.TOPIC_ROUTING_KEY_RIGHT;
+import static org.springframework.amqp.core.ExchangeTypes.TOPIC;
+
+import com.povosdi.rabbitmq.utils.JackJsonUtils;
+import com.povosdi.rabbitmq.utils.UUIDUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +34,24 @@ public class TopicProducer implements RabbitTemplate.ConfirmCallback,RabbitTempl
     }
     
     
-    public void sendTopicOneMessage(Object message){
-//        log.info("模拟发送{}类型的消息:{}", FanoutMqConfig.TOPIC_QUEUE_ONE,JackJsonUtils.toJsonString(message));
-//        rabbitTemplate.convertAndSend(FanoutMqConfig.TOPIC_EXCHANGE , FanoutMqConfig.TOPIC_ROUTING_KEY_ONE, message);
+    public void sendTopicRightMessage(Object message){
+        CorrelationData correlationData = new CorrelationData();
+        correlationData.setId(UUIDUtils.getUuid());
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", TOPIC,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(TOPIC_EXCHANGE,TOPIC_ROUTING_KEY_RIGHT, message,correlationData);
     }
     
-    public void sendTopicTwoMessage(Object message){
-//        log.info("模拟发送{}类型的消息:{}", FanoutMqConfig.TOPIC_QUEUE_TWO,JackJsonUtils.toJsonString(message));
-//        rabbitTemplate.convertAndSend(FanoutMqConfig.TOPIC_EXCHANGE , FanoutMqConfig.TOPIC_ROUTING_KEY_TWO, message);
+    public void sendTopicCommonMessage(Object message){
+        CorrelationData correlationData = new CorrelationData();
+        correlationData.setId(UUIDUtils.getUuid());
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", TOPIC,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(TOPIC_EXCHANGE,TOPIC_ROUTING_KEY_COMMON, message,correlationData);
+    }
+    public void sendTopicErrorMessage(Object message){
+        CorrelationData correlationData = new CorrelationData();
+        correlationData.setId(UUIDUtils.getUuid());
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", TOPIC,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(TOPIC_EXCHANGE,TOPIC_ROUTING_KEY_ERROR, message,correlationData);
     }
     
 
@@ -42,28 +60,11 @@ public class TopicProducer implements RabbitTemplate.ConfirmCallback,RabbitTempl
     
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-//        if(ack){
-//            if(Objects.isNull(correlationData.getReturnedMessage())){
-//                log.info("消息唯一标识id:{}成功发送到队列",correlationData.getId());
-//                log.info("模拟消息成功发送到队列的操作");
-//                return;
-//            }
-//            log.error("消息唯一标识id:{}成功发送到交换机:{}，但是没有找到对应队列",correlationData.getId(),correlationData
-//                .getReturnedMessage().getMessageProperties().getReceivedExchange());
-//            log.error("模拟消息成功发送到交换机但是没有发送到队列的操作");
-//            return;
-//        }
-//        log.error("消息唯一标识id:{},失败原因,cause:{}",correlationData.getId(),cause);
-//        log.error("模拟消息没有发送到交换机的操作");
+
     }
     
     @Override
     public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
-//        log.info("消息发送失败id:{}", message.getMessageProperties().getHeaders().get("spring_returned_message_correlation"));
-//        log.info("消息主体 message:{}", message);
-//        log.info("消息主体 replyCode:{}", replyCode);
-//        log.info("描述:{}" + replyText);
-//        log.info("消息使用的交换器 exchange:{}", exchange);
-//        log.info("消息使用的路由键 routing:{}", routingKey);
+
     }
 }

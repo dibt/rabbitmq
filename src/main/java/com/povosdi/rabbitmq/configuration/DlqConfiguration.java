@@ -17,14 +17,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DlqConfiguration {
     
-    public final static String DEAD_LETTER_QUEUE = "dead_letter_queue";
+    public final static String DEAD_LETTER_QUEUE_RETRY = "dead_letter_queue_retry";
     public final static String DEAD_LETTER_EXCHANGE = "dead_letter_exchange";
-    public final static String DEAD_LETTER_QUEUE_ROUTING_KEY = "dead_letter";
+    public final static String DEAD_LETTER_QUEUE_ROUTING_KEY_RETRY = "deadLetter.retry";
     
 
     @Bean
     public Queue deadLetterQueue(){
-        return QueueBuilder.durable(DEAD_LETTER_QUEUE).build();
+        return QueueBuilder.durable(DEAD_LETTER_QUEUE_RETRY).build();
     }
     @Bean
     public TopicExchange deadLetterExchange(){
@@ -33,6 +33,6 @@ public class DlqConfiguration {
     
     @Bean
     public Binding deadLetterExchangeBinging() {
-        return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with(DEAD_LETTER_QUEUE_ROUTING_KEY);
+        return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with(DEAD_LETTER_QUEUE_ROUTING_KEY_RETRY);
     }
 }

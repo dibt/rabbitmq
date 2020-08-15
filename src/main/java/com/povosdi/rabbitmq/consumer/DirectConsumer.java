@@ -2,11 +2,9 @@ package com.povosdi.rabbitmq.consumer;
 
 import com.povosdi.rabbitmq.configuration.DirectMqConfig;
 import java.nio.charset.StandardCharsets;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class DirectConsumer {
-    @Resource
-    private RabbitTemplate rabbitTemplate;
     
     @RabbitListener(queues = DirectMqConfig.DIRECT_QUEUE)
     public void receiverDirectMessage(Message message){

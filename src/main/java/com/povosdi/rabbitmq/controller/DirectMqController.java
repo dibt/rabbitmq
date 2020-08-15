@@ -25,9 +25,11 @@ public class DirectMqController {
     @Resource
     private DirectProducer directProducer;
     
+    /**
+     *  http://127.0.0.1:8023/direct
+     */
     @GetMapping("direct")
     public String directTest(HttpServletRequest request,HttpServletResponse response){
-        //{"headers":{"exchangeType":"direct"},"timestamp":null,"messageId":null,"userId":null,"appId":null,"clusterId":null,"type":null,"correlationId":null,"replyTo":null,"contentType":"application/json","contentEncoding":"UTF-8","contentLength":0,"deliveryMode":"PERSISTENT","expiration":null,"priority":0,"redelivered":null,"receivedExchange":null,"receivedRoutingKey":null,"receivedUserId":null,"deliveryTag":0,"messageCount":null,"consumerTag":null,"consumerQueue":null,"receivedDelay":null,"receivedDeliveryMode":null,"finalRetryForMessageWithNoId":false,"publishSequenceNumber":1,"lastInBatch":false,"inferredArgumentType":null,"targetMethod":null,"targetBean":null,"delay":null,"replyToAddress":null,"xdeathHeader":null}
         MessageBody messageBody = new MessageBody(1000,"direct类型messageBody,当前时间："+ DateUtils.currentDateToyMdHmS());
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setContentType(CONTENT_TYPE_JSON);
@@ -45,6 +47,7 @@ public class DirectMqController {
      * 消息推送到server，找到交换机了，但是没找到队列 -触发的是 ConfirmCallback和 RetrunCallback两个回调函数 注意ConfirmCallback的ack 为 true
      * 消息推送到sever，交换机和队列都没找到-触发的是 ConfirmCallback
      * 消息推送成功-触发的是 ConfirmCallback
+     * http://127.0.0.1:8023/direct/no-queue-error
      */
     @GetMapping("direct/no-queue-error")
     public String directNoQueueErrorTest(HttpServletRequest request,HttpServletResponse response) {
@@ -52,10 +55,23 @@ public class DirectMqController {
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setContentType(CONTENT_TYPE_JSON);
         messageProperties.setPublishSequenceNumber(1L);
+        // 自定义参数
         messageProperties.setHeader("exchangeType","direct");
         messageProperties.setContentEncoding("UTF-8");
         Message message = new Message(JackJsonUtils.toJsonString(messageBody).getBytes(),messageProperties);
         directProducer.sendNoQueueErrorDirectMessage(message);
+        return request.getRequestURL().toString()+" success";
+    }
+    
+    /**
+     * http://127.0.0.1:8023/direct/no-exchange-error
+     */
+    @GetMapping("direct/no-exchange-error")
+    public String directNoExchangeErrorTest(HttpServletRequest request,HttpServletResponse response) {
+        MessageBody messageBody = new MessageBody(1000,"direct类型messageBody,当前时间："+ DateUtils.currentDateToyMdHmS());
+        MessageProperties messageProperties = new MessageProperties();
+        Message message = new Message(JackJsonUtils.toJsonString(messageBody).getBytes(),messageProperties);
+        directProducer.sendNoExchangeErrorDirectMessage(message);
         return request.getRequestURL().toString()+" success";
     }
    

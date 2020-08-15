@@ -33,15 +33,22 @@ public class DirectProducer implements RabbitTemplate.ConfirmCallback,RabbitTemp
     public void sendDirectMessage(Object message){
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(UUIDUtils.getUuid());
-        log.info("模拟发送{}类型的消息:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message));
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
         rabbitTemplate.convertAndSend(DirectMqConfig.DIRECT_EXCHANGE, DirectMqConfig.DIRECT, message,correlationData);
     }
 
     public void sendNoQueueErrorDirectMessage(Object message){
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(UUID.randomUUID().toString());
-        log.info("模拟发送{}类型的消息:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message));
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
         rabbitTemplate.convertAndSend(DirectMqConfig.DIRECT_EXCHANGE_NO_QUEUE, DirectMqConfig.DIRECT, message,correlationData);
+    }
+    
+    public void sendNoExchangeErrorDirectMessage(Object message){
+        CorrelationData correlationData = new CorrelationData();
+        correlationData.setId(UUID.randomUUID().toString());
+        log.info("模拟发送{}类型的消息:{},correlationData-id:{}", DirectMqConfig.DIRECT,JackJsonUtils.toJsonString(message),correlationData.getId());
+        rabbitTemplate.convertAndSend(DirectMqConfig.DIRECT_NO_EXCHANGE, DirectMqConfig.DIRECT, message,correlationData);
     }
     
     
@@ -50,26 +57,25 @@ public class DirectProducer implements RabbitTemplate.ConfirmCallback,RabbitTemp
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
         if(ack){
             if(Objects.isNull(correlationData.getReturnedMessage())){
-                log.info("消息唯一标识id:{}成功发送到队列",correlationData.getId());
-                log.info("模拟消息成功发送到队列的操作");
+                log.info("{}类型消息唯一标识id:{} 成功发送到队列",DirectMqConfig.DIRECT,correlationData.getId());
+                log.info("模拟{}类型消息成功发送到队列的操作",DirectMqConfig.DIRECT);
                 return;
             }
-            log.error("消息唯一标识id:{}成功发送到交换机:{}，但是没有找到对应队列",correlationData.getId(),correlationData
-                .getReturnedMessage().getMessageProperties().getReceivedExchange());
-            log.error("模拟消息成功发送到交换机但是没有发送到队列的操作");
+            log.error("{}类型消息唯一标识id:{} 成功发送到交换机:{}，但是没有找到对应队列",DirectMqConfig.DIRECT,correlationData.getId(),
+                correlationData.getReturnedMessage().getMessageProperties().getReceivedExchange());
+            log.error("模拟{}类型消息成功发送到交换机但是没有发送到队列的操作,但是 ack 为true",DirectMqConfig.DIRECT);
             return;
         }
-        log.error("消息唯一标识id:{},失败原因,cause:{}",correlationData.getId(),cause);
-        log.error("模拟消息没有发送到交换机的操作");
+        log.error("{}类型消息唯一标识id:{},失败原因,cause:{}",DirectMqConfig.DIRECT,correlationData.getId(),cause);
+        log.error("{}类型模拟消息没有发送到交换机的操作",DirectMqConfig.DIRECT);
     }
     
     @Override
     public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
-//        log.info("消息发送失败id:{}", message.getMessageProperties().getHeaders().get("spring_returned_message_correlation"));
-//        log.info("消息主体 message:{}", message);
-//        log.info("消息主体 replyCode:{}", replyCode);
-//        log.info("描述:{}" + replyText);
-//        log.info("消息使用的交换器 exchange:{}", exchange);
-//        log.info("消息使用的路由键 routing:{}", routingKey);
+        log.error("消息主体 message:{}", JackJsonUtils.toJsonString(message));
+        log.error("消息响应码 replyCode:{}", replyCode);
+        log.error("响应描述 replyText:{}", replyText);
+        log.error("消息使用的交换器 exchange:{}", exchange);
+        log.error("消息使用的路由键 routingKey:{}", routingKey);
     }
 }

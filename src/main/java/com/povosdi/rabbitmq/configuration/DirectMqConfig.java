@@ -19,6 +19,7 @@ public class DirectMqConfig {
     public final static String DIRECT_EXCHANGE = "direct_exchange";
     public final static String DIRECT = "direct";
     public final static String DIRECT_EXCHANGE_NO_QUEUE = "direct_exchange_no_queue";
+    public final static String DIRECT_NO_EXCHANGE = "direct_no_exchange";
     
     /**
      * direct模式队列

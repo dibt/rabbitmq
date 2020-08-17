@@ -39,13 +39,15 @@ public class TopicConsumer {
     }
 
 
-    @RabbitListener(queues = TOPIC_QUEUE_ERROR)
+    @RabbitListener(queues = TOPIC_QUEUE_ERROR,errorHandler = "businessExceptionHandler")
     public void receiveTopicErrorMessageError(Message message) {
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
 
         log.info("模拟接收 {} 类型,路由键为:{}的消息:{}", TOPIC,TOPIC_ROUTING_KEY_ERROR,msg);
-        
+        // BusinessExceptionHandler 会再次路由到死信队列进行重试操作
         throw new BusinessException("模拟消费消息失败");
+        // BusinessExceptionHandler 会打印日志后直接丢弃
+        //throw new RuntimeException("模拟消费消息失败");
     }
     
 }

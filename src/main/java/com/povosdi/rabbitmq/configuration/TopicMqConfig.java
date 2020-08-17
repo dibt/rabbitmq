@@ -45,7 +45,10 @@ public class TopicMqConfig {
     }
     @Bean
     public Queue topicQueueError() {
-        // 可以通过绑定不通类型的交换机来处理不同的逻辑，本示例通过定义一个topic类型的死信交换机进行重试操作，通过在消息的header里定义最大重试次数
+        /**
+         * 可以通过绑定不通类型的交换机来处理不同的逻辑，本示例通过定义一个topic类型的死信交换机进行重试操作，通过在消息的header里定义最大重试次数
+         * 延迟消费、停车场队列都可以通过这种方式实现
+         */
         Map<String,Object> map = new HashMap<>(2);
         map.put("x-dead-letter-exchange",DEAD_LETTER_EXCHANGE);
         map.put("x-dead-letter-routing-key",DEAD_LETTER_QUEUE_ROUTING_KEY_RETRY);

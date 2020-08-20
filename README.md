@@ -1,6 +1,5 @@
 # DLQ Dead Letter Queue
- new SimpleRabbitListenerContainerFactory()
-        ConditionalRejectingErrorHandler
+ 默认 new SimpleRabbitListenerContainerFactory()ConditionalRejectingErrorHandler
         
 RabbitListenerErrorHandler 针对不同的监听器针对 Error 制定不同的 Handler
         
@@ -13,4 +12,6 @@ handler 后台使用 FatalExceptionStrategy 检查异常等级是否为 fatal，
   - MethodArgumentNotValidException
   - NoSuchMethodException
   - ClassCastException
+
+
   

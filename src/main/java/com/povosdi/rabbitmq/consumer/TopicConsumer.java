@@ -8,9 +8,9 @@ import static com.povosdi.rabbitmq.configuration.TopicMqConfig.TOPIC_ROUTING_KEY
 import static com.povosdi.rabbitmq.configuration.TopicMqConfig.TOPIC_ROUTING_KEY_RIGHT;
 import static org.springframework.amqp.core.ExchangeTypes.TOPIC;
 
-import com.povosdi.rabbitmq.exception.BusinessException;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -23,12 +23,28 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class TopicConsumer {
-
-    @RabbitListener(queues = TOPIC_QUEUE_RIGHT)
+    
+    /**
+     * autoAck，default-requeue-rejected=true
+     * BusinessException 会先交由 RabbitListenerErrorHandler-handleError 处理
+     * 然后交由全局异常处理器 ErrorHandler-handleError 处理，后台会进行异常等级判断
+     */
+    
+    //throw new RuntimeException("模拟消费消息失败-RuntimeException");
+    
+    
+    @RabbitListener(queues = TOPIC_QUEUE_RIGHT,containerFactory="simpleRabbitListenerContainerFactory",errorHandler = "businessExceptionHandler")
     public void receiveTopicRightMessage(Message message){
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         log.info("模拟接收 {} 类型,路由键为:{}的消息:{}", TOPIC,TOPIC_ROUTING_KEY_RIGHT,msg);
-        throw new BusinessException("模拟消费消息失败");
+        // BusinessException 路由到死信队列
+//         throw new BusinessException("模拟消费消息失败-BusinessException");
+       
+        //throw new AmqpRejectAndDontRequeueException("模拟消费消息失败-AmqpRejectAndDontRequeueException");
+        //throw new ClassCastException("模拟消费消息失败-ClassCastException");
+        throw new RuntimeException("模拟消费消息失败-RuntimeException");
+        // GlobalException 一直重试
+//        throw new GlobalException("模拟消费消息失败-GlobalException");
     }
 
 
@@ -37,17 +53,20 @@ public class TopicConsumer {
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         log.info("模拟接收 {} 类型,路由键为:{}的消息:{}", TOPIC,TOPIC_ROUTING_KEY_COMMON,msg);
     }
-
-
-    @RabbitListener(queues = TOPIC_QUEUE_ERROR,errorHandler = "businessExceptionHandler")
+    
+    
+    /**
+     * 绑定死信队列，autoAck，default-requeue-rejected=true
+     * 只要抛 AmqpRejectAndDontRequeueException 就可以次路由到死信队列
+     *
+     */
+    @RabbitListener(queues = TOPIC_QUEUE_ERROR)
     public void receiveTopicErrorMessageError(Message message) {
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
 
         log.info("模拟接收 {} 类型,路由键为:{}的消息:{}", TOPIC,TOPIC_ROUTING_KEY_ERROR,msg);
-        // BusinessExceptionHandler 会再次路由到死信队列进行重试操作
-        throw new BusinessException("模拟消费消息失败");
-        // BusinessExceptionHandler 会打印日志后直接丢弃
-        //throw new RuntimeException("模拟消费消息失败");
+        throw new AmqpRejectAndDontRequeueException("模拟消费消息失败-AmqpRejectAndDontRequeueException");
+       
     }
     
 }
